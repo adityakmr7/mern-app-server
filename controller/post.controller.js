@@ -3,6 +3,7 @@ const Post = require("../models/post.model");
 exports.createPost = async (req, res, next) => {
   try {
     const { title, content } = req.body;
+    
     if (!title && !content) {
       res.status(400).json({
         message: "title and content is required!",
@@ -22,8 +23,12 @@ exports.createPost = async (req, res, next) => {
 };
 
 exports.getAllPost = async (req, res, next) => {
+  const page = parseInt(req.query.page);
+  const limit = parseInt(req.query.limit);
+  const skipIndex = (page - 1) * limit;
+
   try {
-    const post = await Post.find();
+    const post = await Post.find().sort({_id: 1}).limit(limit).skip(skipIndex).exec();
     res.status(200).json({
       length: post.length,
       data: post,
