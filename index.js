@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const postRoutes = require('./routes/post.routes');
+const authRoutes = require('./routes/user.routes');
 
 
 require('dotenv').config()
@@ -16,6 +17,7 @@ app.get('/', (req,res,next) => {
 
 // localhost:8080/api/v1/posts/
 app.use('/api/v1/posts', postRoutes)
+app.use('/api/v1/auth', authRoutes);
 const MONGO_URL = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@cluster0.sqskc.mongodb.net/node-server?retryWrites=true&w=majority`
 
 mongoose.connect(MONGO_URL).then(() => {
