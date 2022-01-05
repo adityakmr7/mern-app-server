@@ -14,6 +14,10 @@ const postSchema = new mongoose.Schema({
     content: {
         type:String,
         required:true
+    },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required:true
     }
 },{timestamps: true});
 

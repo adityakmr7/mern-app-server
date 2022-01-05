@@ -16,6 +16,10 @@ class UserServices {
     static async findByUsername(username) {
         return User.findOne({username}).exec();
     }
+    static async findByUserId (id) {
+        const user = await User.findById(id);
+        return user;
+    }
 }
 
 module.exports = UserServices;

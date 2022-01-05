@@ -2,14 +2,24 @@ const Post = require("../models/post.model");
 
 exports.createPost = async (req, res, next) => {
   try {
-    const { title, content } = req.body;
+    const user = req.currentUser;
+
+    if(!user) {
+      res.status(401).json({
+        error:{message: "UnAuthorized!"}
+      })
+    }
     
+    const { title, content } = req.body;
+  
     if (!title && !content) {
       res.status(400).json({
         message: "title and content is required!",
       });
     }
-    const post = await Post.create({ title, content });
+
+
+    const post = await Post.create({userId: user._id, title, content });
     res.status(201).json({
       status: "Post Created!",
       data: { post },
@@ -29,6 +39,7 @@ exports.getAllPost = async (req, res, next) => {
 
   try {
     const post = await Post.find().sort({_id: 1}).limit(limit).skip(skipIndex).exec();
+    console.log(post);
     res.status(200).json({
       length: post.length,
       data: post,
