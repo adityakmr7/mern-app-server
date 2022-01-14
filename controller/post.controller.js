@@ -4,22 +4,21 @@ exports.createPost = async (req, res, next) => {
   try {
     const user = req.currentUser;
 
-    if(!user) {
+    if (!user) {
       res.status(401).json({
-        error:{message: "UnAuthorized!"}
-      })
+        error: { message: "UnAuthorized!" },
+      });
     }
-    
+
     const { title, content } = req.body;
-  
+
     if (!title && !content) {
       res.status(400).json({
         message: "title and content is required!",
       });
     }
 
-
-    const post = await Post.create({userId: user._id, title, content });
+    const post = await Post.create({ userId: user._id, title, content });
     res.status(201).json({
       status: "Post Created!",
       data: { post },
@@ -39,7 +38,7 @@ exports.getAllPost = async (req, res, next) => {
 
   try {
     const post = await Post.find().sort({_id: 1}).limit(limit).skip(skipIndex).exec();
-    console.log(post);
+
     res.status(200).json({
       length: post.length,
       data: post,
@@ -47,6 +46,7 @@ exports.getAllPost = async (req, res, next) => {
   } catch (error) {
     res.status(400).json({
       message: "Something went wrong!",
+      error: error
     });
   }
 };
@@ -59,7 +59,7 @@ exports.getOnePost = async (req, res, next) => {
         message: "post id is required!",
       });
     }
-    const post = await Post.findById(id);
+    const post = await PostServices.getPostById(id);
     if (!post) {
       res.status(400).json({
         message: "post doesn't exist",
@@ -77,31 +77,52 @@ exports.getOnePost = async (req, res, next) => {
 
 exports.updatePost = async (req, res, next) => {
   try {
-      const { id } = req.params;
-      if (!id) {
-        res.status(400).json({
-          message: "post id is required!",
-        });
-      }
-      const post = await Post.findByIdAndUpdate(id, {title: req.body.title, content: req.body.content});
-      if (!post) {
-        res.status(400).json({
-          message: "post doesn't exist",
-        });
-      }
+    const user = req.currentUser;
+
+    if (!user) {
+      res.status(401).json({
+        error: { message: "UnAuthorized!" },
+      });
+    }
+
+    const { id } = req.params;
+    if (!id) {
+      res.status(400).json({
+        message: "post id is required!",
+      });
+    }
+    const post = await Post.findByIdAndUpdate(id, {
+      title: req.body.title,
+      content: req.body.content,
+      userId: user._id,
+    });
+    if (!post) {
+      res.status(400).json({
+        message: "post doesn't exist",
+      });
+    }
+
+    res.status(200).json({
+      message: "post updated!",
+    });
   
-      res.status(200).json({
-        message: "post updated!",
-    
-      }); 
   } catch (error) {
     res.status(400).json({
-        message: "Something went wrong!",
-      }); 
+      message: "Something went wrong!",
+    });
+
+
   }
 };
 exports.deletePost = async (req, res, next) => {
   try {
+    const user = req.currentUser;
+
+    if (!user) {
+      res.status(401).json({
+        error: { message: "UnAuthorized!" },
+      });
+    }
     const { id } = req.params;
     if (!id) {
       res.status(400).json({
