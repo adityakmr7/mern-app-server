@@ -7,6 +7,17 @@ const authRoutes = require('./routes/user.routes');
 require('dotenv').config()
 const app = express();
 
+app.use((req, res, next) => {
+    res.header('Access-control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 
+    'Origin , X-Reaquested-With, Content-Type, Accept, Authorization');
+    if(req.method === 'OPTIONS') {
+        res.header('Accesss-Control-Allow-Methods', 'PUT , POST, PATCH, DELETE, GET' );
+        return res.status(200).json({});
+    }
+    next();
+});
+
 app.use(express.json());
 
 
